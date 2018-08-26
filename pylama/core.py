@@ -89,11 +89,13 @@ def run(path='', code=None, rootdir=CURDIR, options=None):
     if code and errors:
         errors = filter_skiplines(code, errors)
 
-    def key(e): return e.lnum
     if options and options.sort:
         sort = dict((v, n) for n, v in enumerate(options.sort, 1))
 
         def key(e): return (sort.get(e.type, 999), e.lnum)
+    else:
+        def key(e): return e.lnum
+
     return sorted(errors, key=key)
 
 
@@ -124,7 +126,7 @@ def prepare_params(modeline, fileconfig, options):
     for config in filter(None, [modeline, fileconfig]):
         for key in ('ignore', 'select', 'linters'):
             params[key] += process_value(key, config.get(key, []))
-    params['skip'] = bool(int(config.get('skip', False)))
+        params['skip'] = bool(int(config.get('skip', False)))
     # TODO: skip what? This is causing erratic behavior for linters.
     params['skip'] = False
 
